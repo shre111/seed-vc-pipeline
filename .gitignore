@@ -1,0 +1,11 @@
+# Model repos — not part of this project
+seed-vc/
+sadtalker/
+
+# Env files
+.env
+*.env
+
+# OS
+.DS_Store
+Thumbs.db
