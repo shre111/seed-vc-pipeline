@@ -29,42 +29,62 @@ export default function App() {
 
   return (
     <div className="app">
-      <header>
-        <h1>Seed-VC Avatar Pipeline</h1>
-        <p>Clone a voice, animate a face, get a talking avatar video.</p>
+      <header className="app-header">
+        <div className="header-badge">AI Pipeline</div>
+        <h1>Seed-VC Avatar</h1>
+        <p>Clone a voice, animate a face — get a talking avatar video in minutes.</p>
       </header>
 
       <main>
         <form onSubmit={handleSubmit} className="upload-form">
-          <FileInput
-            label="Source Audio"
-            hint="The audio that contains what should be said"
-            accept=".wav,.mp3"
-            file={sourceAudio}
-            onChange={setSourceAudio}
-            disabled={isRunning}
-          />
-          <FileInput
-            label="Reference Voice"
-            hint="A short sample of the voice to clone (5-30 sec)"
-            accept=".wav,.mp3"
-            file={targetAudio}
-            onChange={setTargetAudio}
-            disabled={isRunning}
-          />
-          <FileInput
-            label="Face Image"
-            hint="A clear front-facing photo or illustration"
-            accept=".jpg,.jpeg,.png"
-            file={faceImage}
-            onChange={setFaceImage}
-            disabled={isRunning}
-          />
-          <ExampleFaces onSelect={setFaceImage} disabled={isRunning} />
+
+          <section className="card">
+            <h2 className="section-title">
+              <span className="section-icon">🎤</span>
+              Audio
+            </h2>
+            <div className="input-row">
+              <FileInput
+                label="Source Audio"
+                hint="What should be said"
+                accept=".wav,.mp3"
+                file={sourceAudio}
+                onChange={setSourceAudio}
+                disabled={isRunning}
+              />
+              <FileInput
+                label="Reference Voice"
+                hint="5–30 sec sample to clone"
+                accept=".wav,.mp3"
+                file={targetAudio}
+                onChange={setTargetAudio}
+                disabled={isRunning}
+              />
+            </div>
+          </section>
+
+          <section className="card">
+            <h2 className="section-title">
+              <span className="section-icon">🖼</span>
+              Face
+            </h2>
+            <FileInput
+              label="Face Image"
+              hint="Front-facing photo or illustration"
+              accept=".jpg,.jpeg,.png"
+              file={faceImage}
+              onChange={setFaceImage}
+              disabled={isRunning}
+              type="image"
+            />
+            <ExampleFaces onSelect={setFaceImage} disabled={isRunning} selectedFile={faceImage} />
+          </section>
 
           <div className="actions">
             <button type="submit" disabled={!canSubmit} className="btn-primary">
-              {isRunning ? 'Generating...' : 'Generate Video'}
+              {isRunning
+                ? <><span className="btn-spinner" />Generating…</>
+                : 'Generate Video'}
             </button>
             {(status === 'done' || status === 'failed') && (
               <button type="button" onClick={handleReset} className="btn-secondary">

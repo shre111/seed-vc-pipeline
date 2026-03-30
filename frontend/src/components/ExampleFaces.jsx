@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-export function ExampleFaces({ onSelect, disabled }) {
+export function ExampleFaces({ onSelect, disabled, selectedFile }) {
   const [faces, setFaces] = useState([]);
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -12,18 +12,23 @@ export function ExampleFaces({ onSelect, disabled }) {
       .catch(() => setLoading(false));
   }, []);
 
+  // Deselect if user swapped to their own file upload
+  useEffect(() => {
+    if (!selectedFile || selectedFile.name !== selected) {
+      setSelected(null);
+    }
+  }, [selectedFile]);
+
   async function handleClick(face) {
     if (disabled) return;
     setSelected(face.name);
-
-    // Fetch the image and turn it into a File object for the upload form
     const res = await fetch(face.url);
     const blob = await res.blob();
     const file = new File([blob], face.name, { type: blob.type });
     onSelect(file);
   }
 
-  if (loading) return <p className="examples-loading">Loading examples...</p>;
+  if (loading) return <p className="examples-loading">Loading examples…</p>;
   if (!faces.length) return null;
 
   return (
@@ -37,12 +42,16 @@ export function ExampleFaces({ onSelect, disabled }) {
             className={`face-thumb ${selected === face.name ? 'face-thumb--selected' : ''}`}
             onClick={() => handleClick(face)}
             disabled={disabled}
-            title={face.name}
+            title={face.name.replace(/\.[^.]+$/, '')}
           >
             <img src={face.url} alt={face.name} loading="lazy" />
+            {selected === face.name && <span className="face-thumb-check">✓</span>}
           </button>
         ))}
       </div>
+      {selected && (
+        <p className="examples-selected-name">{selected.replace(/\.[^.]+$/, '')}</p>
+      )}
     </div>
   );
 }
