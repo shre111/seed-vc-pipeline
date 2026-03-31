@@ -16,7 +16,7 @@ export function StatusPanel({ status, progress, error }) {
   const current = stepIndex(status);
 
   return (
-    <div className="status-panel card">
+    <div className={`status-panel card${status === 'done' ? ' status-panel--done' : ''}`}>
       <div className="status-header">
         <span className="status-title">Pipeline Progress</span>
         <span className="progress-pct">{progress}%</span>
