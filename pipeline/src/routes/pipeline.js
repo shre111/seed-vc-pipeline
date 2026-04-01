@@ -70,6 +70,12 @@ router.post(
       faceImage:   face_image[0].path,
     };
 
+    job.inferenceParams = {
+      diffusionSteps: Math.min(100, Math.max(1,  parseInt(req.body.diffusion_steps,  10) || 30)),
+      lengthAdjust:   Math.min(2.0, Math.max(0.5, parseFloat(req.body.length_adjust)    || 1.0)),
+      cfgRate:        Math.min(1.0, Math.max(0.0, parseFloat(req.body.cfg_rate)          || 0.7)),
+    };
+
     // Run pipeline asynchronously
     runPipeline(jobId).catch((err) => {
       console.error(`[job:${jobId}] Fatal:`, err.message);
@@ -111,16 +117,17 @@ router.get('/download/:jobId', (req, res) => {
 async function runPipeline(jobId) {
   const job = getJob(jobId);
   const { sourceAudio, targetAudio, faceImage } = job.inputFiles;
+  const inferenceParams = job.inferenceParams || {};
 
   const workDir = path.join(OUTPUTS_DIR, jobId);
   fs.mkdirSync(workDir, { recursive: true });
 
   // Step 1: Voice cloning
   updateJob(jobId, { status: 'cloning', step: 'voice_cloning', progress: 10 });
-  console.log(`[job:${jobId}] Step 1: Voice cloning...`);
+  console.log(`[job:${jobId}] Step 1: Voice cloning (steps=${inferenceParams.diffusionSteps})...`);
 
   const cloneOutputDir = path.join(workDir, 'seedvc');
-  const clonedAudio = await runSeedVC(sourceAudio, targetAudio, cloneOutputDir);
+  const clonedAudio = await runSeedVC(sourceAudio, targetAudio, cloneOutputDir, inferenceParams);
   updateJob(jobId, { progress: 40 });
   console.log(`[job:${jobId}] Voice cloning done → ${clonedAudio}`);
 

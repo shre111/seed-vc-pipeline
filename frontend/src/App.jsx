@@ -14,10 +14,35 @@ function ReadinessPill({ label, done }) {
   );
 }
 
+function ParamSlider({ label, hint, min, max, step, value, onChange, disabled, format }) {
+  return (
+    <div className="param-slider">
+      <div className="param-slider-header">
+        <span className="param-label">{label}</span>
+        <span className="param-value">{format ? format(value) : value}</span>
+      </div>
+      <input
+        type="range"
+        min={min} max={max} step={step}
+        value={value}
+        onChange={e => onChange(Number(e.target.value))}
+        disabled={disabled}
+        className="slider"
+      />
+      <p className="param-hint">{hint}</p>
+    </div>
+  );
+}
+
 export default function App() {
   const [sourceAudio, setSourceAudio] = useState(null);
   const [targetAudio, setTargetAudio] = useState(null);
   const [faceImage,   setFaceImage]   = useState(null);
+
+  // Inference params
+  const [diffusionSteps, setDiffusionSteps] = useState(30);
+  const [lengthAdjust,   setLengthAdjust]   = useState(1.0);
+  const [cfgRate,        setCfgRate]        = useState(0.7);
 
   const { status, progress, error, downloadUrl, submit, reset } = usePipeline();
 
@@ -26,7 +51,7 @@ export default function App() {
 
   function handleSubmit(e) {
     e.preventDefault();
-    submit({ sourceAudio, targetAudio, faceImage });
+    submit({ sourceAudio, targetAudio, faceImage, diffusionSteps, lengthAdjust, cfgRate });
   }
 
   function handleReset() {
@@ -88,6 +113,42 @@ export default function App() {
             />
             <ExampleFaces onSelect={setFaceImage} disabled={isRunning} selectedFile={faceImage} />
           </section>
+
+          <details className="card advanced-card">
+            <summary className="advanced-summary">
+              <span className="section-icon">⚙️</span>
+              Advanced Settings
+              <span className="advanced-chevron">›</span>
+            </summary>
+            <div className="advanced-body">
+              <ParamSlider
+                label="Diffusion Steps"
+                hint="More steps = higher quality, slower inference. 10 is fast; 50–100 for best results."
+                min={1} max={100} step={1}
+                value={diffusionSteps}
+                onChange={setDiffusionSteps}
+                disabled={isRunning}
+              />
+              <ParamSlider
+                label="Length Adjust"
+                hint="Stretch or compress output speech. 1.0 = original speed."
+                min={0.5} max={2.0} step={0.1}
+                value={lengthAdjust}
+                onChange={setLengthAdjust}
+                disabled={isRunning}
+                format={v => v.toFixed(1) + '×'}
+              />
+              <ParamSlider
+                label="CFG Rate"
+                hint="Classifier-free guidance strength. 0.7 is a good default."
+                min={0.0} max={1.0} step={0.05}
+                value={cfgRate}
+                onChange={setCfgRate}
+                disabled={isRunning}
+                format={v => v.toFixed(2)}
+              />
+            </div>
+          </details>
 
           <div className="readiness-bar">
             <ReadinessPill label="Source Audio"    done={!!sourceAudio} />
