@@ -11,9 +11,19 @@ const SEEDVC_DIR = process.env.SEEDVC_DIR;
  * @param {string} sourceAudio  - Path to the audio whose content to keep (what is said)
  * @param {string} targetAudio  - Path to the reference voice sample (whose voice to clone)
  * @param {string} outputDir    - Directory where output wav will be written
+ * @param {object} [params]     - Optional inference params
+ * @param {number} [params.diffusionSteps=30]  - Diffusion steps (higher = better quality, slower)
+ * @param {number} [params.lengthAdjust=1.0]   - Speech speed (<1 faster, >1 slower)
+ * @param {number} [params.cfgRate=0.7]        - Classifier-free guidance rate
  * @returns {Promise<string>}   - Resolves with the output wav file path
  */
-function runSeedVC(sourceAudio, targetAudio, outputDir) {
+function runSeedVC(sourceAudio, targetAudio, outputDir, params = {}) {
+  const {
+    diffusionSteps = 30,
+    lengthAdjust   = 1.0,
+    cfgRate        = 0.7,
+  } = params;
+
   return new Promise((resolve, reject) => {
     fs.mkdirSync(outputDir, { recursive: true });
 
@@ -22,7 +32,9 @@ function runSeedVC(sourceAudio, targetAudio, outputDir) {
       '--source', sourceAudio,
       '--target', targetAudio,
       '--output', outputDir,
-      '--diffusion-steps', '30',
+      '--diffusion-steps', String(diffusionSteps),
+      '--length-adjust',   String(lengthAdjust),
+      '--inference-cfg-rate', String(cfgRate),
       '--fp16', 'False',
     ];
 
