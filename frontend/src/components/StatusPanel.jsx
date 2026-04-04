@@ -14,9 +14,11 @@ export function StatusPanel({ status, progress, error }) {
   if (status === 'idle') return null;
 
   const current = stepIndex(status);
+  // connector line fill: fraction of steps completed out of gaps between steps
+  const connectorPct = Math.min(100, (current / (STEPS.length - 1)) * 100);
 
   return (
-    <div className="status-panel card">
+    <div className={`status-panel card${status === 'done' ? ' status-panel--done' : ''}`}>
       <div className="status-header">
         <span className="status-title">Pipeline Progress</span>
         <span className="progress-pct">{progress}%</span>
@@ -26,22 +28,29 @@ export function StatusPanel({ status, progress, error }) {
         <div className="progress-fill" style={{ width: `${progress}%` }} />
       </div>
 
-      <ol className="steps">
-        {STEPS.map((step, i) => {
-          const state = i < current ? 'done' : i === current ? 'active' : 'pending';
-          return (
-            <li key={step.key} className={`step step--${state}`}>
-              <span className="step-indicator">
-                {state === 'done'   && <span className="step-check">✓</span>}
-                {state === 'active' && <span className="step-spinner" />}
-                {state === 'pending' && <span className="step-dot" />}
-              </span>
-              <span className="step-icon">{step.icon}</span>
-              <span className="step-label">{step.label}</span>
-            </li>
-          );
-        })}
-      </ol>
+      <div className="steps-wrapper">
+        {/* vertical connector line behind the step indicators */}
+        <div className="connector-track">
+          <div className="connector-fill" style={{ height: `${connectorPct}%` }} />
+        </div>
+
+        <ol className="steps">
+          {STEPS.map((step, i) => {
+            const state = i < current ? 'done' : i === current ? 'active' : 'pending';
+            return (
+              <li key={step.key} className={`step step--${state}`}>
+                <span className="step-indicator">
+                  {state === 'done'    && <span className="step-check">✓</span>}
+                  {state === 'active'  && <span className="step-spinner" />}
+                  {state === 'pending' && <span className="step-dot" />}
+                </span>
+                <span className="step-icon">{step.icon}</span>
+                <span className="step-label">{step.label}</span>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
 
       {status === 'failed' && (
         <div className="error-msg">
