@@ -46,7 +46,7 @@ export function usePipeline() {
     }, 3000);
   }, []);
 
-  const submit = useCallback(async ({ sourceAudio, targetAudio, faceImage }) => {
+  const submit = useCallback(async ({ sourceAudio, targetAudio, faceImage, diffusionSteps = 30, lengthAdjust = 1.0, cfgRate = 0.7 }) => {
     stopPolling();
     setState({ status: 'submitting', jobId: null, progress: 0, step: null, outputFile: null, error: null });
 
@@ -54,6 +54,9 @@ export function usePipeline() {
     form.append('source_audio', sourceAudio);
     form.append('target_audio', targetAudio);
     form.append('face_image', faceImage);
+    form.append('diffusion_steps', String(diffusionSteps));
+    form.append('length_adjust',   String(lengthAdjust));
+    form.append('cfg_rate',        String(cfgRate));
 
     try {
       const res = await fetch(`${API}/start`, { method: 'POST', body: form });
