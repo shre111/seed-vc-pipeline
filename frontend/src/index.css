@@ -525,10 +525,75 @@ body::before {
 .upload-form > *:nth-child(2) { animation-delay: .1s;  }
 .upload-form > *:nth-child(3) { animation-delay: .15s; }
 
+/* ── Readiness pills ────────────────────────────────── */
+.readiness-bar {
+  display: flex;
+  gap: .5rem;
+  flex-wrap: wrap;
+}
+
+.readiness-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  font-size: .74rem;
+  font-weight: 600;
+  padding: .25rem .7rem;
+  border-radius: 99px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.09);
+  color: var(--text-dim);
+  transition: background .25s, border-color .25s, color .25s;
+}
+
+.readiness-pill--done {
+  background: rgba(74,222,128,.1);
+  border-color: rgba(74,222,128,.25);
+  color: var(--success);
+}
+
+.readiness-dot {
+  font-size: .7rem;
+  line-height: 1;
+}
+
+/* ── Button pulse when ready ────────────────────────── */
+.btn-primary--ready {
+  animation: pulse-glow 2.2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 4px 20px rgba(108,99,255,.3); }
+  50%       { box-shadow: 0 4px 32px rgba(108,99,255,.65), 0 0 0 4px rgba(108,99,255,.1); }
+}
+
+/* ── Card hover glow ────────────────────────────────── */
+.card {
+  transition: border-color .25s, box-shadow .25s;
+}
+.card:hover {
+  border-color: rgba(255,255,255,.13);
+  box-shadow: 0 0 0 1px rgba(108,99,255,.08), 0 8px 32px rgba(0,0,0,.3);
+}
+
+/* ── Done celebration on status panel ───────────────── */
+.status-panel--done {
+  border-color: rgba(74,222,128,.3);
+  box-shadow: 0 0 0 1px rgba(74,222,128,.1), 0 0 32px rgba(74,222,128,.08);
+  animation: done-glow 1s ease both;
+}
+
+@keyframes done-glow {
+  from { box-shadow: 0 0 0 0 rgba(74,222,128,.4); }
+  to   { box-shadow: 0 0 0 1px rgba(74,222,128,.1), 0 0 32px rgba(74,222,128,.08); }
+}
+
 /* ── Mobile ─────────────────────────────────────────── */
 @media (max-width: 480px) {
   .app { padding: 1.5rem 1rem 3rem; }
   .app-header h1 { font-size: 1.8rem; }
   .card { padding: 1.1rem 1.1rem; }
   .faces-grid { grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); }
+  .readiness-bar { gap: .4rem; }
+  .readiness-pill { font-size: .7rem; }
 }

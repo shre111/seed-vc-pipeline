@@ -5,6 +5,15 @@ import { StatusPanel } from './components/StatusPanel';
 import { VideoResult } from './components/VideoResult';
 import { usePipeline } from './hooks/usePipeline';
 
+function ReadinessPill({ label, done }) {
+  return (
+    <span className={`readiness-pill${done ? ' readiness-pill--done' : ''}`}>
+      <span className="readiness-dot">{done ? '✓' : '○'}</span>
+      {label}
+    </span>
+  );
+}
+
 export default function App() {
   const [sourceAudio, setSourceAudio] = useState(null);
   const [targetAudio, setTargetAudio] = useState(null);
@@ -80,8 +89,18 @@ export default function App() {
             <ExampleFaces onSelect={setFaceImage} disabled={isRunning} selectedFile={faceImage} />
           </section>
 
+          <div className="readiness-bar">
+            <ReadinessPill label="Source Audio"    done={!!sourceAudio} />
+            <ReadinessPill label="Reference Voice" done={!!targetAudio} />
+            <ReadinessPill label="Face Image"      done={!!faceImage} />
+          </div>
+
           <div className="actions">
-            <button type="submit" disabled={!canSubmit} className="btn-primary">
+            <button
+              type="submit"
+              disabled={!canSubmit}
+              className={`btn-primary${canSubmit ? ' btn-primary--ready' : ''}`}
+            >
               {isRunning
                 ? <><span className="btn-spinner" />Generating…</>
                 : 'Generate Video'}
