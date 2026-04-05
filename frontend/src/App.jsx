@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { FileInput } from './components/FileInput';
 import { ExampleFaces } from './components/ExampleFaces';
 import { StatusPanel } from './components/StatusPanel';
 import { VideoResult } from './components/VideoResult';
+import { ToastContainer } from './components/Toast';
 import { usePipeline } from './hooks/usePipeline';
 
 function ReadinessPill({ label, done }) {
@@ -34,10 +35,13 @@ function ParamSlider({ label, hint, min, max, step, value, onChange, disabled, f
   );
 }
 
+let toastIdSeq = 0;
+
 export default function App() {
   const [sourceAudio, setSourceAudio] = useState(null);
   const [targetAudio, setTargetAudio] = useState(null);
   const [faceImage,   setFaceImage]   = useState(null);
+  const [toasts,      setToasts]      = useState([]);
 
   // Inference params
   const [diffusionSteps, setDiffusionSteps] = useState(30);
@@ -45,6 +49,30 @@ export default function App() {
   const [cfgRate,        setCfgRate]        = useState(0.7);
 
   const { status, progress, error, downloadUrl, submit, reset } = usePipeline();
+  const prevStatusRef = useRef(status);
+
+  const addToast = useCallback((message, type = 'info') => {
+    const id = ++toastIdSeq;
+    setToasts(prev => [...prev, { id, message, type }]);
+  }, []);
+
+  const dismissToast = useCallback((id) => {
+    setToasts(prev => prev.filter(t => t.id !== id));
+  }, []);
+
+  // Fire toasts on status transitions
+  useEffect(() => {
+    const prev = prevStatusRef.current;
+    prevStatusRef.current = status;
+
+    if (prev === 'idle' && status === 'submitting') {
+      addToast('Job submitted — pipeline starting…', 'info');
+    } else if (prev !== 'done' && status === 'done') {
+      addToast('Avatar video is ready!', 'success');
+    } else if (prev !== 'failed' && status === 'failed') {
+      addToast(error || 'Pipeline failed.', 'error');
+    }
+  }, [status, error, addToast]);
 
   const isRunning = ['submitting', 'queued', 'cloning', 'animating', 'processing'].includes(status);
   const canSubmit = sourceAudio && targetAudio && faceImage && !isRunning;
@@ -177,6 +205,15 @@ export default function App() {
         <StatusPanel status={status} progress={progress} error={error} />
         <VideoResult downloadUrl={downloadUrl} />
       </main>
+
+      <footer className="app-footer">
+        <span>Powered by</span>
+        <a href="https://github.com/Plachtaa/seed-vc" target="_blank" rel="noreferrer">Seed-VC</a>
+        <span>&</span>
+        <a href="https://github.com/OpenTalker/SadTalker" target="_blank" rel="noreferrer">SadTalker</a>
+      </footer>
+
+      <ToastContainer toasts={toasts} onDismiss={dismissToast} />
     </div>
   );
 }
