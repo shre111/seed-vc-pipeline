@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 const STEPS = [
   { key: 'queued',     label: 'Job queued',                  icon: '⏳' },
   { key: 'cloning',    label: 'Cloning voice (Seed-VC)',      icon: '🎙' },
@@ -6,22 +8,46 @@ const STEPS = [
   { key: 'done',       label: 'Done',                        icon: '✅' },
 ];
 
+const RUNNING = ['queued', 'cloning', 'animating', 'processing'];
+
 function stepIndex(status) {
   return STEPS.findIndex(s => s.key === status);
 }
 
+function formatElapsed(s) {
+  if (s < 60) return `${s}s`;
+  return `${Math.floor(s / 60)}m ${s % 60}s`;
+}
+
 export function StatusPanel({ status, progress, error }) {
+  const [elapsed, setElapsed] = useState(0);
+
+  useEffect(() => {
+    if (!RUNNING.includes(status)) {
+      setElapsed(0);
+      return;
+    }
+    setElapsed(0);
+    const t = setInterval(() => setElapsed(e => e + 1), 1000);
+    return () => clearInterval(t);
+  }, [status]);
+
   if (status === 'idle') return null;
 
   const current = stepIndex(status);
-  // connector line fill: fraction of steps completed out of gaps between steps
   const connectorPct = Math.min(100, (current / (STEPS.length - 1)) * 100);
+  const isRunning = RUNNING.includes(status);
 
   return (
     <div className={`status-panel card${status === 'done' ? ' status-panel--done' : ''}`}>
       <div className="status-header">
         <span className="status-title">Pipeline Progress</span>
-        <span className="progress-pct">{progress}%</span>
+        <div className="status-header-right">
+          {isRunning && (
+            <span className="elapsed-timer">{formatElapsed(elapsed)}</span>
+          )}
+          <span className="progress-pct">{progress}%</span>
+        </div>
       </div>
 
       <div className="progress-bar">
@@ -29,7 +55,6 @@ export function StatusPanel({ status, progress, error }) {
       </div>
 
       <div className="steps-wrapper">
-        {/* vertical connector line behind the step indicators */}
         <div className="connector-track">
           <div className="connector-fill" style={{ height: `${connectorPct}%` }} />
         </div>

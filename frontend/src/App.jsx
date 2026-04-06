@@ -98,6 +98,25 @@ export default function App() {
       </header>
 
       <main>
+        {status === 'idle' && (
+          <div className="how-it-works">
+            <div className="how-step">
+              <span className="how-num">1</span>
+              <span className="how-label">Upload audio</span>
+            </div>
+            <span className="how-arrow">→</span>
+            <div className="how-step">
+              <span className="how-num">2</span>
+              <span className="how-label">Choose a face</span>
+            </div>
+            <span className="how-arrow">→</span>
+            <div className="how-step">
+              <span className="how-num">3</span>
+              <span className="how-label">Generate video</span>
+            </div>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="upload-form">
 
           <section className="card">
