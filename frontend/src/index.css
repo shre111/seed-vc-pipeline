@@ -230,6 +230,74 @@ body::before {
   display: block;
 }
 
+/* ── File clear button ──────────────────────────────── */
+.clear-btn {
+  position: absolute;
+  top: .4rem;
+  right: .4rem;
+  z-index: 2;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,.55);
+  color: rgba(255,255,255,.75);
+  font-size: .6rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s, color .15s, transform .15s;
+  line-height: 1;
+}
+.clear-btn:hover {
+  background: var(--error);
+  color: #fff;
+  transform: scale(1.15);
+}
+
+/* ── How it works strip ─────────────────────────────── */
+.how-it-works {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .75rem;
+  margin-bottom: 1.4rem;
+  animation: fadeDown .4s ease both;
+}
+
+.how-step {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+}
+
+.how-num {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(108,99,255,.18);
+  border: 1px solid rgba(108,99,255,.35);
+  color: var(--accent-2);
+  font-size: .72rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.how-label {
+  font-size: .78rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.how-arrow {
+  color: var(--text-dim);
+  font-size: .8rem;
+}
+
 /* ── Actions ────────────────────────────────────────── */
 .actions { display: flex; gap: .75rem; }
 
@@ -290,8 +358,20 @@ body::before {
 .status-header {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
   margin-bottom: .7rem;
+}
+
+.status-header-right {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+}
+
+.elapsed-timer {
+  font-size: .75rem;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
 }
 
 .status-title {
