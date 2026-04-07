@@ -196,7 +196,7 @@ export default function App() {
             </button>
             {(status === 'done' || status === 'failed') && (
               <button type="button" onClick={handleReset} className="btn-secondary">
-                Start Over
+                ↺ Start Over
               </button>
             )}
           </div>
