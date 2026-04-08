@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 function formatSize(bytes) {
   if (bytes < 1024) return `${bytes} B`;
@@ -12,7 +12,14 @@ export function FileInput({ label, hint, accept, file, onChange, disabled, type 
   const inputRef = useRef();
 
   const isImage = type === 'image';
-  const previewUrl = isImage && file ? URL.createObjectURL(file) : null;
+  const [previewUrl, setPreviewUrl] = useState(null);
+
+  useEffect(() => {
+    if (!isImage || !file) { setPreviewUrl(null); return; }
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file, isImage]);
 
   function handleDrop(e) {
     e.preventDefault();
