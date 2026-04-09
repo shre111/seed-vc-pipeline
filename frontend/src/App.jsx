@@ -196,7 +196,7 @@ export default function App() {
             </button>
             {(status === 'done' || status === 'failed') && (
               <button type="button" onClick={handleReset} className="btn-secondary">
-                Start Over
+                ↺ Start Over
               </button>
             )}
           </div>
@@ -209,8 +209,10 @@ export default function App() {
       <footer className="app-footer">
         <span>Powered by</span>
         <a href="https://github.com/Plachtaa/seed-vc" target="_blank" rel="noreferrer">Seed-VC</a>
-        <span>&</span>
+        <span className="dot" />
         <a href="https://github.com/OpenTalker/SadTalker" target="_blank" rel="noreferrer">SadTalker</a>
+        <span className="dot" />
+        <a href="https://ffmpeg.org" target="_blank" rel="noreferrer">FFmpeg</a>
       </footer>
 
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
