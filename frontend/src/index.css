@@ -75,11 +75,18 @@ body::before {
 .app-header h1 {
   font-size: 2.2rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #fff 30%, var(--accent-2));
+  background: linear-gradient(135deg, #fff 0%, var(--accent-2) 50%, #fff 100%);
+  background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   line-height: 1.2;
+  animation: gradient-pan 6s linear infinite;
+}
+
+@keyframes gradient-pan {
+  0%   { background-position: 0% center; }
+  100% { background-position: 200% center; }
 }
 
 .app-header p {
@@ -120,7 +127,7 @@ body::before {
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
 }
-@media (max-width: 520px) { .input-row { grid-template-columns: 1fr; } }
+@media (max-width: 480px) { .input-row { grid-template-columns: 1fr; } }
 
 /* ── FileInput ──────────────────────────────────────── */
 .file-input label {
@@ -782,6 +789,51 @@ details[open] .advanced-chevron { transform: rotate(90deg); }
 @keyframes toastIn {
   from { opacity: 0; transform: translateX(20px) scale(.95); }
   to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+/* ── Format badge ───────────────────────────────────── */
+.format-badge {
+  margin-left: auto;
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 99px;
+  padding: .15rem .55rem;
+}
+
+/* ── Keyboard shortcut hint ─────────────────────────── */
+.actions-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: .45rem;
+}
+
+.actions-col .btn-primary { width: 100%; }
+
+.kbd-hint {
+  font-size: .75rem;
+  color: var(--text-dim);
+  text-align: center;
+  line-height: 1;
+}
+
+kbd {
+  display: inline-block;
+  font-size: .7rem;
+  font-family: inherit;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.12);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  padding: .1rem .35rem;
+  line-height: 1.4;
 }
 
 /* ── Mobile ─────────────────────────────────────────── */

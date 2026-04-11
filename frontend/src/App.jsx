@@ -77,6 +77,18 @@ export default function App() {
   const isRunning = ['submitting', 'queued', 'cloning', 'animating', 'processing'].includes(status);
   const canSubmit = sourceAudio && targetAudio && faceImage && !isRunning;
 
+  // Ctrl+Enter (or ⌘+Enter on Mac) keyboard shortcut to submit
+  useEffect(() => {
+    function onKeyDown(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && canSubmit) {
+        e.preventDefault();
+        submit({ sourceAudio, targetAudio, faceImage, diffusionSteps, lengthAdjust, cfgRate });
+      }
+    }
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [canSubmit, sourceAudio, targetAudio, faceImage, diffusionSteps, lengthAdjust, cfgRate, submit]);
+
   function handleSubmit(e) {
     e.preventDefault();
     submit({ sourceAudio, targetAudio, faceImage, diffusionSteps, lengthAdjust, cfgRate });
@@ -104,6 +116,7 @@ export default function App() {
             <h2 className="section-title">
               <span className="section-icon">🎤</span>
               Audio
+              <span className="format-badge">WAV · MP3</span>
             </h2>
             <div className="input-row">
               <FileInput
@@ -129,6 +142,7 @@ export default function App() {
             <h2 className="section-title">
               <span className="section-icon">🖼</span>
               Face
+              <span className="format-badge">JPG · PNG</span>
             </h2>
             <FileInput
               label="Face Image"
@@ -185,15 +199,22 @@ export default function App() {
           </div>
 
           <div className="actions">
-            <button
-              type="submit"
-              disabled={!canSubmit}
-              className={`btn-primary${canSubmit ? ' btn-primary--ready' : ''}`}
-            >
-              {isRunning
-                ? <><span className="btn-spinner" />Generating…</>
-                : 'Generate Video'}
-            </button>
+            <div className="actions-col">
+              <button
+                type="submit"
+                disabled={!canSubmit}
+                className={`btn-primary${canSubmit ? ' btn-primary--ready' : ''}`}
+              >
+                {isRunning
+                  ? <><span className="btn-spinner" />Generating…</>
+                  : 'Generate Video'}
+              </button>
+              {canSubmit && (
+                <p className="kbd-hint">
+                  or press <kbd>Ctrl</kbd><kbd>↵</kbd>
+                </p>
+              )}
+            </div>
             {(status === 'done' || status === 'failed') && (
               <button type="button" onClick={handleReset} className="btn-secondary">
                 Start Over
