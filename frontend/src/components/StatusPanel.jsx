@@ -10,12 +10,15 @@ function stepIndex(status) {
   return STEPS.findIndex(s => s.key === status);
 }
 
+const RUNNING = new Set(['queued', 'cloning', 'animating', 'processing', 'submitting']);
+
 export function StatusPanel({ status, progress, error }) {
   if (status === 'idle') return null;
 
   const current = stepIndex(status);
   // connector line fill: fraction of steps completed out of gaps between steps
   const connectorPct = Math.min(100, (current / (STEPS.length - 1)) * 100);
+  const isRunning = RUNNING.has(status);
 
   return (
     <div className={`status-panel card${status === 'done' ? ' status-panel--done' : ''}`}>
@@ -25,7 +28,10 @@ export function StatusPanel({ status, progress, error }) {
       </div>
 
       <div className="progress-bar">
-        <div className="progress-fill" style={{ width: `${progress}%` }} />
+        <div
+          className={`progress-fill${isRunning ? ' progress-fill--running' : ''}`}
+          style={{ width: `${progress}%` }}
+        />
       </div>
 
       <div className="steps-wrapper">
