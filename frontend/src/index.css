@@ -316,10 +316,30 @@ body::before {
   margin-bottom: 1.2rem;
 }
 .progress-fill {
+  position: relative;
   height: 100%;
   background: linear-gradient(90deg, var(--accent), var(--accent-2));
   border-radius: 99px;
   transition: width .6s cubic-bezier(.4,0,.2,1);
+  overflow: hidden;
+}
+
+.progress-fill--running::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,.35) 50%,
+    transparent 100%
+  );
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(200%); }
 }
 
 .steps-wrapper {
