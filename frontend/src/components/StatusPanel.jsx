@@ -18,7 +18,7 @@ export function StatusPanel({ status, progress, error }) {
   const connectorPct = Math.min(100, (current / (STEPS.length - 1)) * 100);
 
   return (
-    <div className={`status-panel card${status === 'done' ? ' status-panel--done' : ''}`}>
+    <div className={`status-panel card${status === 'done' ? ' status-panel--done' : status === 'failed' ? ' status-panel--failed' : ''}`}>
       <div className="status-header">
         <span className="status-title">Pipeline Progress</span>
         <span className="progress-pct">{progress}%</span>
