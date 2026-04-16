@@ -21,6 +21,11 @@ export function FileInput({ label, hint, accept, file, onChange, disabled, type 
     return () => URL.revokeObjectURL(url);
   }, [file, isImage]);
 
+  // Clear the native input value when file is reset so the same file can be re-selected
+  useEffect(() => {
+    if (!file && inputRef.current) inputRef.current.value = '';
+  }, [file]);
+
   function handleDrop(e) {
     e.preventDefault();
     setDragging(false);
