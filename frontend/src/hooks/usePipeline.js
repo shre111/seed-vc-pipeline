@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 
 const API = '/api/pipeline';
 
@@ -79,6 +79,9 @@ export function usePipeline() {
     stopPolling();
     setState({ status: 'idle', jobId: null, progress: 0, step: null, outputFile: null, error: null });
   }, []);
+
+  // Stop polling if the consumer component unmounts mid-job
+  useEffect(() => () => stopPolling(), []);
 
   return { ...state, submit, reset, downloadUrl };
 }
