@@ -17,7 +17,7 @@ export function ExampleFaces({ onSelect, disabled, selectedFile }) {
     if (!selectedFile || selectedFile.name !== selected) {
       setSelected(null);
     }
-  }, [selectedFile]);
+  }, [selectedFile, selected]);
 
   async function handleClick(face) {
     if (disabled) return;
