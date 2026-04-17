@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export function ExampleFaces({ onSelect, disabled, selectedFile }) {
   const [faces, setFaces] = useState([]);
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
+  const latestClickRef = useRef(null);
 
   useEffect(() => {
     fetch('/api/examples/faces')
@@ -22,8 +23,10 @@ export function ExampleFaces({ onSelect, disabled, selectedFile }) {
   async function handleClick(face) {
     if (disabled) return;
     setSelected(face.name);
+    latestClickRef.current = face.name;
     const res = await fetch(face.url);
     const blob = await res.blob();
+    if (latestClickRef.current !== face.name) return; // superseded by a newer click
     const file = new File([blob], face.name, { type: blob.type });
     onSelect(file);
   }
