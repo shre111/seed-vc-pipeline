@@ -70,10 +70,11 @@ router.post(
       faceImage:   face_image[0].path,
     };
 
+    const toNum = (val, def) => { const n = parseFloat(val); return Number.isFinite(n) ? n : def; };
     job.inferenceParams = {
-      diffusionSteps: Math.min(100, Math.max(1,  parseInt(req.body.diffusion_steps,  10) || 30)),
-      lengthAdjust:   Math.min(2.0, Math.max(0.5, parseFloat(req.body.length_adjust)    || 1.0)),
-      cfgRate:        Math.min(1.0, Math.max(0.0, parseFloat(req.body.cfg_rate)          || 0.7)),
+      diffusionSteps: Math.min(100, Math.max(1,   toNum(req.body.diffusion_steps, 30))),
+      lengthAdjust:   Math.min(2.0, Math.max(0.5, toNum(req.body.length_adjust,   1.0))),
+      cfgRate:        Math.min(1.0, Math.max(0.0, toNum(req.body.cfg_rate,         0.7))),
     };
 
     // Run pipeline asynchronously
@@ -150,5 +151,13 @@ async function runPipeline(jobId) {
 
   updateJob(jobId, { status: 'done', step: null, progress: 100, outputFile: finalVideo });
 }
+
+// Return multer errors (wrong type, file too large) as JSON instead of HTML
+router.use((err, req, res, next) => {
+  if (err && (err.code === 'LIMIT_FILE_SIZE' || err.message?.includes('not allowed'))) {
+    return res.status(400).json({ error: err.message });
+  }
+  next(err);
+});
 
 module.exports = router;
