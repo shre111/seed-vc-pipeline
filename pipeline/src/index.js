@@ -5,6 +5,18 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 
+const REQUIRED_ENV = [
+  'SEEDVC_PYTHON', 'SADTALKER_PYTHON',
+  'SEEDVC_DIR',    'SADTALKER_DIR',
+  'FFMPEG_BIN',    'UPLOADS_DIR', 'OUTPUTS_DIR',
+];
+const missing = REQUIRED_ENV.filter(k => !process.env[k]);
+if (missing.length) {
+  console.error(`[startup] Missing required env vars: ${missing.join(', ')}`);
+  console.error('[startup] Check your pipeline/.env file. Server will not start.');
+  process.exit(1);
+}
+
 const pipelineRouter = require('./routes/pipeline');
 const examplesRouter = require('./routes/examples');
 
