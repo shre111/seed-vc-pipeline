@@ -30,7 +30,7 @@ function normaliseVideo(inputFile, outputFile) {
     const proc = spawn(ffmpegExe, args);
 
     let stderr = '';
-    proc.stderr.on('data', (d) => { stderr += d.toString(); });
+    proc.stderr.on('data', (d) => { stderr += d.toString(); if (stderr.length > 2000) stderr = stderr.slice(-2000); });
 
     proc.on('close', (code) => {
       if (code !== 0) return reject(new Error(`FFmpeg exited ${code}: ${stderr}`));
