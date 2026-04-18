@@ -4,13 +4,14 @@ export function ExampleFaces({ onSelect, disabled, selectedFile }) {
   const [faces, setFaces] = useState([]);
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
   const latestClickRef = useRef(null);
 
   useEffect(() => {
     fetch('/api/examples/faces')
-      .then(r => r.json())
+      .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(data => { setFaces(data); setLoading(false); })
-      .catch(() => setLoading(false));
+      .catch(() => { setFetchError(true); setLoading(false); });
   }, []);
 
   // Deselect if user swapped to their own file upload
@@ -32,6 +33,7 @@ export function ExampleFaces({ onSelect, disabled, selectedFile }) {
   }
 
   if (loading) return <p className="examples-loading">Loading examples…</p>;
+  if (fetchError) return <p className="examples-error">Could not load example faces.</p>;
   if (!faces.length) return null;
 
   return (
