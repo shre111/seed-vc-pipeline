@@ -478,7 +478,8 @@ body::before {
   letter-spacing: .06em;
   margin-bottom: .65rem;
 }
-.examples-loading { font-size: .8rem; color: var(--text-dim); margin-top: .5rem; }
+.examples-loading { font-size: .8rem; color: var(--text-dim);  margin-top: .5rem; }
+.examples-error   { font-size: .8rem; color: var(--error);     margin-top: .5rem; }
 
 .faces-grid {
   display: grid;
