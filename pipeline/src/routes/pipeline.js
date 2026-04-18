@@ -77,11 +77,16 @@ router.post(
       cfgRate:        Math.min(1.0, Math.max(0.0, toNum(req.body.cfg_rate,         0.7))),
     };
 
-    // Run pipeline asynchronously
-    runPipeline(jobId).catch((err) => {
-      console.error(`[job:${jobId}] Fatal:`, err.message);
-      updateJob(jobId, { status: 'failed', error: err.message });
-    });
+    // Run pipeline asynchronously; clean up uploaded inputs when done
+    runPipeline(jobId)
+      .catch((err) => {
+        console.error(`[job:${jobId}] Fatal:`, err.message);
+        updateJob(jobId, { status: 'failed', error: err.message });
+      })
+      .finally(() => {
+        const uploadDir = path.join(UPLOADS_DIR, jobId);
+        fs.rm(uploadDir, { recursive: true, force: true }, () => {});
+      });
 
     res.status(202).json({ jobId, status: 'queued' });
   }
