@@ -43,9 +43,9 @@ export function FileInput({ label, hint, accept, file, onChange, disabled, type 
       <p className="hint">{hint}</p>
 
       <div
-        className={`drop-zone ${file ? 'has-file' : ''} ${disabled ? 'disabled' : ''} ${dragging ? 'dragging' : ''} ${isImage && file ? 'has-preview' : ''}`}
+        className={['drop-zone', file && 'has-file', disabled && 'disabled', dragging && 'dragging', isImage && file && 'has-preview'].filter(Boolean).join(' ')}
         onDragOver={e => { e.preventDefault(); if (!disabled) setDragging(true); }}
-        onDragLeave={() => setDragging(false)}
+        onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget)) setDragging(false); }}
         onDrop={handleDrop}
       >
         <input
