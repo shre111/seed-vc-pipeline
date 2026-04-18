@@ -42,17 +42,21 @@ function runSeedVC(sourceAudio, targetAudio, outputDir, params = {}) {
     const proc = spawn(SEEDVC_PYTHON, args, { cwd: SEEDVC_DIR, env });
 
     let stderr = '';
-    proc.stderr.on('data', (d) => { stderr += d.toString(); });
+    proc.stderr.on('data', (d) => { stderr += d.toString(); if (stderr.length > 2000) stderr = stderr.slice(-2000); });
     proc.stdout.on('data', (d) => { process.stdout.write('[seedvc] ' + d); });
 
     proc.on('close', (code) => {
       if (code !== 0) return reject(new Error(`Seed-VC exited ${code}: ${stderr}`));
 
-      // Seed-VC writes output as: vc_<source>_<target>_<params>.wav
       const files = fs.readdirSync(outputDir).filter(f => f.endsWith('.wav'));
       if (!files.length) return reject(new Error('Seed-VC produced no output wav'));
 
-      resolve(path.join(outputDir, files[0]));
+      // Sort by mtime descending so leftover .wav files from prior runs are not picked
+      const latest = files
+        .map(f => ({ f, mtime: fs.statSync(path.join(outputDir, f)).mtime }))
+        .sort((a, b) => b.mtime - a.mtime)[0].f;
+
+      resolve(path.join(outputDir, latest));
     });
 
     proc.on('error', reject);

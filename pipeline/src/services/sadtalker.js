@@ -38,7 +38,7 @@ function runSadTalker(faceImage, audioFile, outputDir) {
     const proc = spawn(SADTALKER_PYTHON, args, { cwd: SADTALKER_DIR, env });
 
     let stderr = '';
-    proc.stderr.on('data', (d) => { stderr += d.toString(); });
+    proc.stderr.on('data', (d) => { stderr += d.toString(); if (stderr.length > 2000) stderr = stderr.slice(-2000); });
     proc.stdout.on('data', (d) => { process.stdout.write('[sadtalker] ' + d); });
 
     proc.on('close', (code) => {
