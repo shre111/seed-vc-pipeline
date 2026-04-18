@@ -16,13 +16,13 @@ export function usePipeline() {
 
   const stopPolling = () => {
     if (pollRef.current) {
-      clearInterval(pollRef.current);
+      clearTimeout(pollRef.current);
       pollRef.current = null;
     }
   };
 
   const poll = useCallback((jobId) => {
-    pollRef.current = setInterval(async () => {
+    const tick = async () => {
       try {
         const res = await fetch(`${API}/status/${jobId}`);
         const data = await res.json();
@@ -36,14 +36,17 @@ export function usePipeline() {
           error: data.error,
         }));
 
-        if (data.status === 'done' || data.status === 'failed') {
-          stopPolling();
+        if (data.status !== 'done' && data.status !== 'failed') {
+          pollRef.current = setTimeout(tick, 3000);
+        } else {
+          pollRef.current = null;
         }
       } catch (err) {
-        stopPolling();
+        pollRef.current = null;
         setState(prev => ({ ...prev, status: 'failed', error: 'Lost connection to server' }));
       }
-    }, 3000);
+    };
+    pollRef.current = setTimeout(tick, 3000);
   }, []);
 
   const submit = useCallback(async ({ sourceAudio, targetAudio, faceImage, diffusionSteps = 30, lengthAdjust = 1.0, cfgRate = 0.7 }) => {
