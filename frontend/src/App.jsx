@@ -60,6 +60,22 @@ export default function App() {
     setToasts(prev => prev.filter(t => t.id !== id));
   }, []);
 
+  // Update browser tab title based on pipeline status
+  useEffect(() => {
+    const titles = {
+      idle:       'Seed-VC Avatar',
+      submitting: '⏳ Starting… | Seed-VC Avatar',
+      queued:     '⏳ Queued… | Seed-VC Avatar',
+      cloning:    '🎙 Cloning voice… | Seed-VC Avatar',
+      animating:  '🎬 Animating… | Seed-VC Avatar',
+      processing: '⚙️ Processing… | Seed-VC Avatar',
+      done:       '✅ Ready! | Seed-VC Avatar',
+      failed:     '❌ Failed | Seed-VC Avatar',
+    };
+    document.title = titles[status] ?? 'Seed-VC Avatar';
+    return () => { document.title = 'Seed-VC Avatar'; };
+  }, [status]);
+
   // Fire toasts on status transitions
   useEffect(() => {
     const prev = prevStatusRef.current;

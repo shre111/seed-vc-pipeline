@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react';
+
 const STEPS = [
   { key: 'queued',     label: 'Job queued',                  icon: '⏳' },
   { key: 'cloning',    label: 'Cloning voice (Seed-VC)',      icon: '🎙' },
@@ -11,14 +13,27 @@ function stepIndex(status) {
 }
 
 export function StatusPanel({ status, progress, error }) {
+  const panelRef = useRef(null);
+
+  // Scroll into view when job first becomes visible
+  useEffect(() => {
+    if (status === 'queued' && panelRef.current) {
+      panelRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [status]);
+
   if (status === 'idle') return null;
 
   const current = stepIndex(status);
-  // connector line fill: fraction of steps completed out of gaps between steps
   const connectorPct = Math.min(100, (current / (STEPS.length - 1)) * 100);
 
   return (
-    <div className={`status-panel card${status === 'done' ? ' status-panel--done' : ''}`}>
+    <div
+      ref={panelRef}
+      className={`status-panel card${status === 'done' ? ' status-panel--done' : ''}`}
+      aria-live="polite"
+      aria-label="Pipeline progress"
+    >
       <div className="status-header">
         <span className="status-title">Pipeline Progress</span>
         <span className="progress-pct">{progress}%</span>
@@ -29,7 +44,6 @@ export function StatusPanel({ status, progress, error }) {
       </div>
 
       <div className="steps-wrapper">
-        {/* vertical connector line behind the step indicators */}
         <div className="connector-track">
           <div className="connector-fill" style={{ height: `${connectorPct}%` }} />
         </div>
