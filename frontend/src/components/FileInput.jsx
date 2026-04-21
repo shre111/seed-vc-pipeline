@@ -34,6 +34,13 @@ export function FileInput({ label, hint, accept, file, onChange, disabled, type 
     if (dropped) onChange(dropped);
   }
 
+  function handleClear(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    onChange(null);
+    if (inputRef.current) inputRef.current.value = '';
+  }
+
   return (
     <div className="file-input">
       <label htmlFor={id}>
@@ -56,6 +63,12 @@ export function FileInput({ label, hint, accept, file, onChange, disabled, type 
           disabled={disabled}
           onChange={e => onChange(e.target.files[0] || null)}
         />
+
+        {file && !disabled && (
+          <button className="clear-btn" onClick={handleClear} title="Remove file" type="button">
+            ✕
+          </button>
+        )}
 
         {isImage && previewUrl ? (
           <div className="image-preview">
