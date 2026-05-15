@@ -13,17 +13,22 @@ const FEATURED = [
   'people_0.png', 'sad.png', 'full3.png', 'full4.jpeg',
 ];
 
+const exists = (f) => fs.promises.access(f).then(() => true).catch(() => false);
+
 // GET /api/examples/faces — list available example images
-router.get('/faces', (req, res) => {
-  const available = FEATURED.filter(f => fs.existsSync(path.join(IMAGES_DIR, f)));
+router.get('/faces', async (req, res) => {
+  const results = await Promise.all(
+    FEATURED.map(async (f) => (await exists(path.join(IMAGES_DIR, f))) ? f : null)
+  );
+  const available = results.filter(Boolean);
   res.json(available.map(f => ({ name: f, url: `/api/examples/faces/${f}` })));
 });
 
 // GET /api/examples/faces/:filename — serve the image file
-router.get('/faces/:filename', (req, res) => {
+router.get('/faces/:filename', async (req, res) => {
   const filename = path.basename(req.params.filename); // prevent path traversal
   const filePath = path.join(IMAGES_DIR, filename);
-  if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'Not found' });
+  if (!(await exists(filePath))) return res.status(404).json({ error: 'Not found' });
   res.sendFile(filePath);
 });
 
