@@ -35,13 +35,12 @@ function ParamSlider({ label, hint, min, max, step, value, onChange, disabled, f
   );
 }
 
-let toastIdSeq = 0;
-
 export default function App() {
   const [sourceAudio, setSourceAudio] = useState(null);
   const [targetAudio, setTargetAudio] = useState(null);
   const [faceImage,   setFaceImage]   = useState(null);
   const [toasts,      setToasts]      = useState([]);
+  const toastIdRef = useRef(0);
 
   // Inference params
   const [diffusionSteps, setDiffusionSteps] = useState(30);
@@ -52,7 +51,7 @@ export default function App() {
   const prevStatusRef = useRef(status);
 
   const addToast = useCallback((message, type = 'info') => {
-    const id = ++toastIdSeq;
+    const id = ++toastIdRef.current;
     setToasts(prev => [...prev, { id, message, type }]);
   }, []);
 
