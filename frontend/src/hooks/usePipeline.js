@@ -25,6 +25,7 @@ export function usePipeline() {
     const tick = async () => {
       try {
         const res = await fetch(`${API}/status/${jobId}`);
+        if (!res.ok) throw new Error(`Status check failed (${res.status})`);
         const data = await res.json();
 
         setState(prev => ({
@@ -63,9 +64,11 @@ export function usePipeline() {
 
     try {
       const res = await fetch(`${API}/start`, { method: 'POST', body: form });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || `Server error (${res.status})`);
+      }
       const data = await res.json();
-
-      if (!res.ok) throw new Error(data.error || 'Submission failed');
 
       setState(prev => ({ ...prev, status: 'queued', jobId: data.jobId }));
       poll(data.jobId);
