@@ -157,9 +157,14 @@ async function runPipeline(jobId) {
   updateJob(jobId, { status: 'done', step: null, progress: 100, outputFile: finalVideo });
 }
 
-// Return multer errors (wrong type, file too large) as JSON instead of HTML
+// Return multer errors (wrong type, file too large) as JSON instead of HTML.
+// Also delete any partially uploaded files — multer may have written some files
+// before rejecting, and no job record exists to trigger the normal cleanup.
 router.use((err, req, res, next) => {
   if (err && (err.code === 'LIMIT_FILE_SIZE' || err.message?.includes('not allowed'))) {
+    if (req.jobId) {
+      fs.rm(path.join(UPLOADS_DIR, req.jobId), { recursive: true, force: true }, () => {});
+    }
     return res.status(400).json({ error: err.message });
   }
   next(err);
